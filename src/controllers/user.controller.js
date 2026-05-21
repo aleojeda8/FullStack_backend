@@ -1,0 +1,61 @@
+import {
+    getUsersService,
+    createUserService,
+    updateUserService,
+    deleterUserService,
+} from '../services/user.service.js';
+
+const getUsers = async(req, res) =>{
+    try{
+        console.log('CONTROLLER -> getUsers')
+        const users = await getUsersService()
+        res.json(users)
+    }catch (error) {
+        res.status(500).json({
+            error: error.message
+        })
+    }
+}
+
+const createUser = async(req, res) =>{
+    try{
+        console.log('CONTROLLER -> createUser')
+        const user = await createUserService(req.body)
+        res.json(user)
+    }catch (error) {
+        res.status(500).json({
+            error: error.message
+        })
+    }
+}
+
+const updateUser = async(req, res) =>{
+    try{
+        console.log('CONTROLLER -> updateUser')
+        const user = await updateUser(req.params.id,req.body)
+        res.json(user)
+    }catch (error) {
+        res.status(500).json({
+            error: error.message
+        })
+    }
+}
+
+const deleterUser = async(req, res) =>{
+    try{
+        console.log('CONTROLLER -> deleterUser')
+        const result = await deleterUserService(req.params.id)
+        res.json(result)
+    }catch (error) {
+        res.status(500).json({
+            error: error.message
+        })
+    }
+}
+
+export{
+    getUsers,
+    createUser,
+    updateUser,
+    deleterUser
+}

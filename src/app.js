@@ -1,10 +1,12 @@
 import express from 'express';
+
 import './config/env.js'
 
-import ConnectDB from '.config/db.js'
+import ConnectDB from './config/db.js'
 
-import userRoutes from './routes/use.routes.js'
-import { connect } from 'mongoose';
+import userRoutes from './routes/user.routes.js'
+
+/// import { connect } from 'mongoose';
 
 const app = express()
 

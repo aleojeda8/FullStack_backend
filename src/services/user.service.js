@@ -28,7 +28,7 @@ const createUserService = async(data) => {
         const user = new User({
             nombre: data.nombre,
             apellido: data.apellido,
-            email: data.emaill,
+            email: data.email,
             password: hashedPassword,
             edad: data.edad,
             sexo: data.sexo,
@@ -42,13 +42,13 @@ const createUserService = async(data) => {
             id: user._id,
             nombre: user.nombre,
             apellido: user.apellido,
-            email: user.emaill,
+            email: user.email,
             edad: user.edad,
             sexo: user.sexo,
             telefono: user.telefono,
             direccion: user.direccion
         }
-    }catch(eroor){
+    }catch(error){
         throw error
     }
 }

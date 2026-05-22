@@ -1,38 +1,38 @@
-import { number, required, string } from 'joi';
+///import { number, required, string } from 'joi';
 import mongoose from 'mongoose';
 
 const userSchema = new mongoose.Schema({
     nombre: {
-        type: string,
+        type: String,
         required: true
     },
     apellido:{
-        type: string,
+        type: String,
         required: true
     },
     email:{
-        type: string,
+        type: String,
         required: true,
         unique: true
     },
     password:{
-        type: string,
+        type: String,
         required: true
     },
     edad:{
-        type: number,
+        type: Number,
         required: true
     },
     sexo:{
-        type: string,
+        type: String,
         required: true
     },
     telefono:{
-        type: string,
+        type: String,
         required: true
     },
     direccion:{
-        type: string,
+        type: String,
         required: true
     }
 },{

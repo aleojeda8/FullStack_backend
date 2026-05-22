@@ -1,4 +1,4 @@
-import { date, object, required } from 'joi'
+///import { date, object, required } from 'joi'
 import mongoose from 'mongoose'
 const auditSchema = new mongoose.Schema({
     usuarioEliminado:{

@@ -1,7 +1,12 @@
 ///import { number, required, string } from 'joi';
+// import { required } from 'Joi';
 import mongoose from 'mongoose';
 
 const userSchema = new mongoose.Schema({
+    // id:{
+    //     type: Object,
+    //     require: true
+    // },
     nombre: {
         type: String,
         required: true
@@ -32,6 +37,22 @@ const userSchema = new mongoose.Schema({
         required: true
     },
     direccion:{
+        type: String,
+        required: true
+    },
+    localidad:{
+        type: String,
+        required: true
+    },
+    provincia:{
+        type: String,
+        required: true
+    },
+    codigopostal:{
+        type: String,
+        required: true
+    },
+    pais:{
         type: String,
         required: true
     }

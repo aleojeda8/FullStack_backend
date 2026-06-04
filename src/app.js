@@ -8,13 +8,13 @@ import userRoutes from './routes/user.routes.js'
 
 /// import { connect } from 'mongoose';
 
-const app = express()
+const app = express();
 
-app.use(express.json())
+app.use(express.json());
 
-ConnectDB()
+ConnectDB();
 
-app.use(userRoutes)
+app.use(userRoutes);
 
 app.listen(process.env.PORT,() =>{
     console.log(`Servidor corriendo en puerto ${process.env.PORT}`)

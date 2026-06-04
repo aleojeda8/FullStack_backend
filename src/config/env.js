@@ -1,7 +1,7 @@
 import dotenv from 'dotenv'
 dotenv.config()
 
-console.log('Varables de entorno cargadas')
+console.log('Variables de entorno cargadas')
 
 console.log(process.env.MONGO_URI)
 console.log(process.env.PORT)

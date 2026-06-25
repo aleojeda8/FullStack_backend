@@ -1,87 +1,152 @@
 import{
     createUserSchema,
     updateUserSchema,
-    userParamsSchema
+    userParamsSchema,
 } from '../dto/user.dto.js'
 
 import {
     getUsersService,
     createUserService,
     updateUserService,
-    deleterUserService,
+    deleteUserService,
 } from '../services/user.service.js';
 
+import {
+    successResponse,
+    errorResponse,
+}from "../helpers/response.helper.js"
+import { response } from 'express';
 
 const getUsers = async(req, res) =>{
     try{
-        console.log('CONTROLLER -> getUsers')
-        const users = await getUsersService()
-        res.json(users)
+        const {email,id} = req.query;
+        const users = await getUsersService({
+            email,id,
+        });
+        return successResponse(
+            res,users,"Usuarios obtenidos correctamente"
+        );
     }catch (error) {
-        res.status(500).json({
-            error: error.message
-        })
+        return errorResponse(
+            res,
+            error.message || "Error interno del sistema",
+            error.statusCode || 500,
+            error.erros || null
+        );
     }
-}
+};
 
 const createUser = async(req, res) =>{
     try{
-        console.log('CONTROLLER -> createUser')
         const {error} = createUserSchema.validate(req.body)
         if(error){
-            return res.status(400).json({
-                error: error.details[0].message
-            })
+            return errorResponse(
+                res,
+                "Error de validacion",
+                400,
+                error.details
+            );
         }
-        const user = await createUserService(req.body)
-        res.status(201).json(user)
-    }catch (error) {
-        res.status(500).json({
-            error: error.message
-        })
-    }
-}
+        const user = await createUserService(req.body);
 
-const updateUser = async(req, res) =>{
-    try{
-        console.log('CONTROLLER -> updateUser')
-        const {error: paramsError } = userParamsSchema.validate(req.params)
-        console.log("updateUser - error:", paramsError)
-        if(paramsError){
-            return res.status(400).json({
-                message: 'Id invalido'
-            })
-        }
-        const {error} = updateUserSchema.validate(req.body)
-        if(error){
-            return res.status(400).json({
-                error: error.details[0].message
-            })
-        }
-        const user = await updateUserService(req.params.id,req.body)
-        res.json(user)
+        return successResponse(
+            res,
+            user,
+            "Usuario creado correctamente",
+            201
+        );
     }catch (error) {
-        res.status(500).json({
-            error: error.message
-        })
+        return errorResponse(
+            res,
+            error.message || "Error interno del servidor",
+            error.statusCode || 500,
+            error.erros || null
+        );
     }
-}
+};
 
-const deleterUser = async(req, res) =>{
-    try{
-        console.log('CONTROLLER -> deleterUser')
-        const result = await deleterUserService(req.params.id)
-        res.json(result)
-    }catch (error) {
-        res.status(500).json({
-            error: error.message
-        })
+const updateUser = async (req, res) => {
+    try {
+    const { error: paramsError } =
+        userParamsSchema.validate(req.params);
+
+    if (paramsError) {
+        return errorResponse(
+        res,
+        "Id inválido",
+        400,
+        paramsError.details
+        );
     }
-}
 
-export{
+    const { error } =
+        updateUserSchema.validate(req.body);
+
+    if (error) {
+        return errorResponse(
+        res,
+        "Error de validación",
+        400,
+        error.details
+        );
+    }
+
+    const user = await updateUserService(
+        req.params.id,
+        req.body
+    );
+
+    return successResponse(
+        res,
+        user,
+        "Usuario actualizado correctamente"
+    );
+    } catch (error) {
+    return errorResponse(
+        res,
+        error.message || "Error interno del servidor",
+        error.statusCode || 500,
+        error.errors || null
+    );
+    }
+};
+
+const deleteUser = async (req, res) => {
+    try {
+    const { error: paramsError } =
+        userParamsSchema.validate(req.params);
+
+    if (paramsError) {
+        return errorResponse(
+        res,
+        "Id inválido",
+        400,
+        paramsError.details
+        );
+    }
+
+    const result = await deleteUserService(
+        req.params.id
+    );
+
+    return successResponse(
+        res,
+        result,
+        "Usuario eliminado correctamente"
+    );
+    } catch (error) {
+    return errorResponse(
+        res,
+        error.message || "Error interno del servidor",
+        error.statusCode || 500,
+        error.errors || null
+    );
+    }
+};
+
+export {
     getUsers,
     createUser,
     updateUser,
-    deleterUser
-}
+    deleteUser,
+};

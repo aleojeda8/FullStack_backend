@@ -24,11 +24,15 @@ const userSchema = new mongoose.Schema({
         type: String,
         required: true
     },
+    fechaNacimiento:{
+        type: Date,
+        required: true
+    },
     edad:{
         type: Number,
         required: true
     },
-    sexo:{
+    genero:{
         type: String,
         required: true
     },
@@ -48,14 +52,23 @@ const userSchema = new mongoose.Schema({
         type: String,
         required: true
     },
-    codigopostal:{
+    cp:{
         type: String,
         required: true
     },
     pais:{
         type: String,
         required: true
-    }
+    },
+    role: {
+        type: String,
+        enum: ["ROOT", "ADMIN", "USER", "GUEST"],
+        default: "USER",
+    },
+    ultimoLogin: {
+        type: Date,
+        default: null,
+    },
 },{
     timestamps: true
 })

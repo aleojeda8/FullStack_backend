@@ -12,7 +12,7 @@ const createUserSchema = Joi.object({
         "number.base": "La edad debe ser numerica",
         "number.integer": "La edad debe ser un numero entero",
         "number.min": "La edad debe ser mayor a 0",
-        "number.max": "La edad no uede ser mayor a 120",
+        "number.max": "La edad no puede ser mayor a 120",
     }),
     genero: Joi.string().trim().required(),
     telefono: Joi.string().trim().min(6).max(20).required(),
@@ -21,7 +21,7 @@ const createUserSchema = Joi.object({
     provincia: Joi.string().trim().max(100).required(),
     cp: Joi.string().trim().max(10).required(),
     pais: Joi.string().trim().max(100).required(),
-    role: Joi.string().valid(...roles).default("USER").messages({
+    role: Joi.string().valid(...roles)/*.default("USER")*/.messages({
         "any.only": `El rol debe ser uno de los siguientes: ${roles.join(", ")}`,
     }),
 });
@@ -45,7 +45,7 @@ const updateUserSchema = Joi.object({
     provincia: Joi.string().trim().max(100),
     cp: Joi.string().trim().max(10),
     pais: Joi.string().trim().max(100),
-    role: Joi.string().valid(...roles).default("USER").messages({
+    role: Joi.string().valid(...roles)/*.default("USER")*/.messages({
         "any.only": `El rol debe ser uno de los siguientes: ${roles.join(", ")}`,
     }),
 }).min(1)

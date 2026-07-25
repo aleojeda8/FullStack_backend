@@ -2,35 +2,108 @@ import bcrypt from 'bcryptjs'
 import User  from '../models/user.model.js'
 import Audit from '../models/audit.model.js'
 import mongoose from 'mongoose';
-const getUsersService = async({ id, email } = {}) => {
+
+const getUsersService = async({ id, email, requesterRole, requesterId}) => {
     console.log('service -> getUsersService')
     try{
-        if(id){
-            if(!mongoose.Types.ObjectId.isValid(id)){
-                throw{
-                    statusCode: 400,
-                    message: "Id invalido",
-                };
-            }
-            const user = await User.findById(id).select("-password");
-            if(!user){
-                throw{
-                    statusCode: 404,
-                    message: "Usuario no encontrado",
-                };
-            }
-            return user;  
+        const role = requesterRole?.toUpperCase();
+        const currentUserId = requesterId?.toString();
+
+        if (!role) {
+            throw {
+                statusCode: 403,
+                message: "No tienes permisos para ver usuarios",
+            };
         }
-        if(email){
-            const user = await User.findOne({ email }).select("-password");
-            if(!user){
-                throw{
+
+        if (role === "GUEST") {
+            throw {
+                statusCode: 403,
+                message: "No tienes permisos para ver usuarios",
+            };
+        }
+
+        // Buscar por ID
+        if (id) {
+        if (!mongoose.Types.ObjectId.isValid(id)) {
+            throw {
+                statusCode: 400,
+                message: "Id inválido",
+            };
+        }
+
+        if (role === "USER" && id !== currentUserId) {
+            throw {
+                statusCode: 403,
+                message: "No tienes permisos para ver este usuario",
+            };
+        }
+
+        const user = await User.findById(id).select("-password");
+        if (!user) {
+            throw {
+                statusCode: 404,
+                message: "Usuario no encontrado",
+            };
+        }
+
+        if (role === "ADMIN" && user.role === "ROOT") {
+            throw {
+                statusCode: 403,
+                message: "No tienes permisos para ver usuarios root",
+            };
+        }
+
+            return user;
+        }
+
+        // Buscar por email
+        if (email) {
+            const user = await User.findOne({
+                email,
+        }).select("-password");
+        if (!user) {
+            throw {
+                statusCode: 404,
+                message: "Usuario no encontrado",
+            };
+        }
+
+        if (role === "USER" && user._id.toString() !== currentUserId) {
+            throw {
+                statusCode: 403,
+                message: "No tienes permisos para ver este usuario",
+            };
+        }
+
+        if (role === "ADMIN" && user.role === "ROOT") {
+            throw {
+                statusCode: 403,
+                message: "No tienes permisos para ver usuarios root",
+            };
+        }
+
+            return user;
+        }
+
+        if (role === "USER") {
+            const user = await User.findById(currentUserId).select("-password");
+            if (!user) {
+                throw {
                     statusCode: 404,
                     message: "Usuario no encontrado",
                 };
             }
             return user;
         }
+        // Obtener todos
+
+        if (role === "ADMIN") {
+            return await User.find({ role: { $ne: "ROOT" } })
+            .select("-password")
+            .sort({ nombre: 1 });
+        }
+
         return await User.find().select("-password").sort({nombre:1});
     }catch(error){
         throw{
@@ -70,7 +143,8 @@ const createUserService = async(data) => {
             localidad: data.localidad,
             provincia: data.provincia,
             cp: data.cp,
-            pais: data.pais
+            pais: data.pais,
+            role: data.role,
         });
 
         await user.save()
@@ -87,7 +161,8 @@ const createUserService = async(data) => {
             localidad: user.localidad,
             provincia: user.provincia,
             cp: user.cp,
-            pais: user.pais
+            pais: user.pais,
+            role: user.role,
         };
     }
     catch(error){
@@ -128,19 +203,7 @@ const updateUserService = async(id,data) => {
             };
         }
 
-        const allowedFields = [
-            "nombre",
-            "apellido",
-            "fechaNacimiento",
-            "edad",
-            "genero",
-            "telefono",
-            "direccion",
-            "localidad",
-            "provincia",
-            "cp",
-            "pais",
-        ];
+        const allowedFields = ["nombre", "apellido","fechaNacimiento","edad","genero","telefono","direccion","localidad","provincia","cp", "pais",];
 
         allowedFields.forEach((field) => {
             if(data[field] !== undefined){
@@ -170,7 +233,8 @@ const updateUserService = async(id,data) => {
             localidad: user.localidad,
             provincia: user.provincia,
             cp: user.cp,
-            pais: user.pais
+            pais: user.pais,
+            role: user.role
         };
     }catch(error){
         console.error(
@@ -221,7 +285,7 @@ const deleteUserService = async(id) => {
         throw{
             statusCode: error.statusCode || 500,
             message: error.message || "Error interno del servidor",
-            errors: error.erros || null,
+            errors: error.errors || null,
         };
     }finally{
         if(session){
@@ -230,9 +294,4 @@ const deleteUserService = async(id) => {
     }
 };
 
-export{
-    getUsersService,
-    createUserService,
-    updateUserService,
-    deleteUserService
-};
+export{getUsersService,createUserService,updateUserService,deleteUserService};

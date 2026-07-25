@@ -25,8 +25,8 @@ const loginService = async (data) => {
         }
         user.ultimoLogin = new Date();
         await user.save();
-        const paylod = {userId: user._id,role: user.role,};
-        const token = jwt.sign(paylod, env.JWT_SECRET, {expiresIn: env.JWT_EXPIRES_IN,},);
+        const payload = {userId: user._id,role: user.role,};
+        const token = jwt.sign(payload, env.JWT_SECRET, {expiresIn: env.JWT_EXPIRES_IN,},);
         return {token,role:user.role};
     }catch(error){
         console.error("Error en loginService:",error);

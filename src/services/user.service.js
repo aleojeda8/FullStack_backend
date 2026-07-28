@@ -16,13 +16,6 @@ const getUsersService = async({ id, email, requesterRole, requesterId}) => {
             };
         }
 
-        if (role === "GUEST") {
-            throw {
-                statusCode: 403,
-                message: "No tienes permisos para ver usuarios",
-            };
-        }
-
         // Buscar por ID
         if (id) {
         if (!mongoose.Types.ObjectId.isValid(id)) {
@@ -32,7 +25,7 @@ const getUsersService = async({ id, email, requesterRole, requesterId}) => {
             };
         }
 
-        if (role === "USER" && id !== currentUserId) {
+        if (role === " GUEST" && id !== currentUserId) {
             throw {
                 statusCode: 403,
                 message: "No tienes permisos para ver este usuario",
@@ -86,7 +79,17 @@ const getUsersService = async({ id, email, requesterRole, requesterId}) => {
             return user;
         }
 
-        if (role === "USER") {
+        // if (role === "USER") {
+        //     const user = await User.findById(currentUserId).select("-password");
+        //     if (!user) {
+        //         throw {
+        //             statusCode: 404,
+        //             message: "Usuario no encontrado",
+        //         };
+        //     }
+        //     return [user];
+        // }
+        if (role === "GUEST") {
             const user = await User.findById(currentUserId).select("-password");
             if (!user) {
                 throw {
@@ -94,12 +97,17 @@ const getUsersService = async({ id, email, requesterRole, requesterId}) => {
                     message: "Usuario no encontrado",
                 };
             }
-            return user;
+            return [user];
         }
         // Obtener todos
 
         if (role === "ADMIN") {
             return await User.find({ role: { $ne: "ROOT" } })
+            .select("-password")
+            .sort({ nombre: 1 });
+        }
+        if (role === "USER") {
+            return await User.find({ role: {  $in: ["USER", "GUEST"] } })
             .select("-password")
             .sort({ nombre: 1 });
         }
@@ -203,7 +211,8 @@ const updateUserService = async(id,data) => {
             };
         }
 
-        const allowedFields = ["nombre", "apellido","fechaNacimiento","edad","genero","telefono","direccion","localidad","provincia","cp", "pais",];
+        const allowedFields = ["nombre", "apellido","fechaNacimiento","edad","genero","telefono",
+            "direccion","localidad","provincia","cp", "pais","role",];
 
         allowedFields.forEach((field) => {
             if(data[field] !== undefined){

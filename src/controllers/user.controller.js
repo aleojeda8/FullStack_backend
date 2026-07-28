@@ -78,7 +78,7 @@ const updateUser = async (req, res) => {
 
     const user = await updateUserService(
         req.params.id,
-        req.body
+        req.body,
     );
 
     return successResponse(

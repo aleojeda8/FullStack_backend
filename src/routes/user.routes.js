@@ -5,7 +5,7 @@ import { authorizeRoles} from '../middlewares/role.middleware.js';
 
 const router = express.Router();
 
-router.get("/users",authMiddlewere,authorizeRoles('ROOT','ADMIN', 'USER'), getUsers);
+router.get("/users",authMiddlewere,authorizeRoles('ROOT','ADMIN', 'USER', 'GUEST'), getUsers);
 router.post("/users",authMiddlewere,authorizeRoles('ROOT','ADMIN'), createUser);
 router.put("/users/:id",authMiddlewere,authorizeRoles('ROOT','ADMIN'), updateUser);
 router.delete("/users/:id",authMiddlewere,authorizeRoles('ROOT','ADMIN'), deleteUser);

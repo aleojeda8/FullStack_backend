@@ -1,6 +1,8 @@
 import {createUserSchema,updateUserSchema,userParamsSchema,} from '../dto/user.dto.js'
 import {getUsersService,createUserService,updateUserService,deleteUserService,} from '../services/user.service.js';
 import {successResponse, errorResponse, forbiddenResponse } from "../helpers/response.helper.js";
+import { sendEditRequestEmail } from '../services/mail.service.js'
+import User from '../models/user.model.js'
 import { response } from 'express';
 
 const getUsers = async(req, res) =>{
@@ -129,9 +131,41 @@ const deleteUser = async (req, res) => {
     }
 };
 
+const requestEdit = async (req, res) => {
+    try {
+        const { cambios } = req.body
+
+        if (!Array.isArray(cambios) || cambios.length === 0) {
+            return errorResponse(res, "No se enviaron cambios", 400);
+        }
+
+        const user = await User.findById(req.user.userId).select("nombre apellido email");
+
+        if (!user) {
+            return errorResponse(res, "Usuario no encontrado", 404);
+        }
+
+        await sendEditRequestEmail({
+            nombre: user.nombre,
+            apellido: user.apellido,
+            email: user.email,
+            cambios,
+        })
+
+        return successResponse(res, null, "Solicitud enviada correctamente");
+    } catch (error) {
+        return errorResponse(
+            res,
+            error.message || "Error interno del servidor",
+            error.statusCode || 500,
+        );
+    }
+};
+
 export {
     getUsers,
     createUser,
     updateUser,
     deleteUser,
+    requestEdit,
 };

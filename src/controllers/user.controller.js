@@ -113,7 +113,9 @@ const deleteUser = async (req, res) => {
     }
 
     const result = await deleteUserService(
-        req.params.id
+        req.params.id,
+        req.user.userId,
+        req.user.role,
     );
 
     return successResponse(

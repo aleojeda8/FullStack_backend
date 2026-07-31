@@ -5,6 +5,15 @@ const auditSchema = new mongoose.Schema({
         type: Object,
         required: true
     },
+    eliminadoPor:{
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'User',
+        required: true
+    },
+    rolDelEliminador:{
+        type: String,
+        required: true
+    },
     fechaEliminacion:{
         type: Date,
         default: Date.now

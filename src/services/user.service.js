@@ -258,7 +258,7 @@ const updateUserService = async(id,data) => {
     }
 } ;
 
-const deleteUserService = async(id) => {
+const deleteUserService = async(id, requesterId, requesterRole) => {
     console.log('service -> deleteUserService')
     let session;
     try{
@@ -266,6 +266,12 @@ const deleteUserService = async(id) => {
             throw{
                 statusCode: 400,
                 message: "Id invalido",
+            };
+        }
+        if(id === requesterId){
+            throw{
+                statusCode: 400,
+                message: "No podes eliminar tu propio usuario",
             };
         }
         session = await mongoose.startSession();
@@ -277,8 +283,16 @@ const deleteUserService = async(id) => {
                 message: "Usuario no encontrado",
                 };
             }
+            if((user.role === "ROOT" || user.role === "ADMIN") && requesterRole !== "ROOT"){
+                throw{
+                    statusCode: 403,
+                    message: "Solo un ROOT puede eliminar a un ADMIN o a otro ROOT",
+                };
+            }
             await Audit.create([{
                 usuarioEliminado: user.toObject(),
+                eliminadoPor: requesterId,
+                rolDelEliminador: requesterRole,
                 fechaEliminacion: new Date()
             },],{session});
             await user.deleteOne({session});

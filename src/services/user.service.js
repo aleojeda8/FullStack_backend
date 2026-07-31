@@ -25,7 +25,7 @@ const getUsersService = async({ id, email, requesterRole, requesterId}) => {
             };
         }
 
-        if (role === " GUEST" && id !== currentUserId) {
+        if (role === "GUEST" && id !== currentUserId) {
             throw {
                 statusCode: 403,
                 message: "No tienes permisos para ver este usuario",
